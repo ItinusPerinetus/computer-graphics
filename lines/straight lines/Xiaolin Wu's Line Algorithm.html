@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xiaolin Wu's Line Drawing Algorithm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: black;
+            color: white;
+        }
+
+        canvas {
+            border: 1px solid blue;
+            margin: 10px;
+        }
+
+        .label {
+            text-align: center;
+            margin-top: -15px;
+        }
+
+        .explanation {
+            max-width: 800px;
+            text-align: justify;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="..\..\index.html" style="color: lime">หน้าหลัก</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1 style="text-align: center; color:cyan">ขั้นตอนวิธีลากเส้นตรงของ Xiaolin Wu<br>(Xiaolin Wu's Line Drawing Algorithm)</h1>
+    <p>
+        <canvas id="canvas" width="400" height="400"></canvas>
+        <canvas id="gridCanvas" width="400" height="400"></canvas>
+    </p>
+    <div class="explanation">
+        <p style="text-align: center">
+            ขั้นตอนวิธีลากเส้นตรงของ Xiaolin Wu เป็นเทคนิคที่ใช้วาดเส้นให้ราบเรียบขึ้นโดยไร้รอยหยัก (Anti-Aliasing)<br>
+            ซึ่งแตกต่างจากขั้นตอนวิธี Bresenham ที่พิกเซลของเส้นจะเห็นเหลี่ยมได้ชัดเมื่อขยายดู<br>
+            โดยขั้นตอนวิธีนี้พัฒนามาจาก Bresenham ที่เพิ่มการเฉลี่ยค่าความเข้มในแต่ละคู่ของพิกเซล
+        </p>
+        <br>
+        <h2 style="text-align: center; color:cyan">โค้ดเทียมขั้นตอนวิธีเส้นของ Xiaolin Wu</h2>
+        <p>
+            <section style="color: gray"></section>
+            <section style="color:orange">
+                ฟังก์ชัน ลากเส้นจากจุด (x<sub>1</sub>, y<sub>1</sub>) ไปที่จุด (x<sub>2</sub>, y<sub>2</sub>) :<br>
+                <section style="color:pink">
+                    &emsp;ตั้งชัน = |ความต่าง<sub>y</sub>| > |ความต่าง<sub>x</sub>|<br>
+                    &emsp;ถ้า ตั้งชัน :<br>
+                    <section style="color:orange">
+                        &emsp;&emsp;สลับค่าระหว่าง x<sub>1</sub> กับ y<sub>1</sub><br>
+                        &emsp;&emsp;สลับค่าระหว่าง x<sub>2</sub> กับ y<sub>2</sub><br>
+                    </section>
+                    &emsp;ถ้า x<sub>1</sub> > x<sub>2</sub> :<br>
+                    <section style="color:orange">
+                        &emsp;&emsp;สลับค่าระหว่าง x<sub>1</sub> กับ x<sub>2</sub><br>
+                        &emsp;&emsp;สลับค่าระหว่าง y<sub>1</sub> กับ y<sub>2</sub><br>
+                    </section>
+                    &emsp;ความต่าง<sub>x</sub> = x<sub>2</sub> - x<sub>1</sub><br>
+                    &emsp;ความต่าง<sub>y</sub> = y<sub>2</sub> - y<sub>1</sub><br>
+                    &emsp;ความชัน = ความต่าง<sub>y</sub> / ความต่าง<sub>x</sub><br>
+                    &emsp;ปลาย<sub>x</sub> = ปัดเศษ(x<sub>1</sub>)<br>
+                    &emsp;ปลาย<sub>y</sub> = y<sub>1</sub> + ความชัน × (ปลาย<sub>x</sub> - x<sub>1</sub>)<br>
+                    &emsp;ช่องว่าง<sub>x</sub> = 1 - เศษทศนิยม(x<sub>1</sub>)<br>
+                    &emsp;พิกเซลจุดเริ่มต้น<sub>x</sub> = ปลาย<sub>x</sub><br>
+                    &emsp;พิกเซลจุดเริ่มต้น<sub>y</sub> = ปัดเศษลง(ปลาย<sub>y</sub>)<br>
+                    &emsp;ถ้า ตั้งชัน :<br>
+                    <section style="color:orange">
+                        &emsp;&emsp;ลงจุดที่ตำแหน่ง (พิกเซลจุดเริ่มต้น<sub>y</sub>, พิกเซลจุดเริ่มต้น<sub>x</sub>) ด้วยความเข้มเป็น ช่องว่าง<sub>x</sub> × (1 - เศษทศนิยม(ปลาย<sub>y</sub>) )<br>
+                        &emsp;&emsp;ลงจุดที่ตำแหน่ง (พิกเซลจุดเริ่มต้น<sub>y</sub> + 1, พิกเซลจุดเริ่มต้น<sub>x</sub>) ด้วยความเข้มเป็น ช่องว่าง<sub>x</sub> × เศษทศนิยม(ปลาย<sub>y</sub>)<br>
+                    </section>
+                    &emsp;มิฉะนั้น :<br>
+                    <section style="color:orange">
+                        &emsp;&emsp;ลงจุดที่ตำแหน่ง (พิกเซลจุดเริ่มต้น<sub>x</sub>, พิกเซลจุดเริ่มต้น<sub>y</sub>) ด้วยความเข้มเป็น ช่องว่าง<sub>x</sub> × (1 - เศษทศนิยม(ปลาย<sub>y</sub>) )<br>
+                        &emsp;&emsp;ลงจุดที่ตำแหน่ง (พิกเซลจุดเริ่มต้น<sub>x</sub>, พิกเซลจุดเริ่มต้น<sub>y</sub> + 1) ด้วยความเข้มเป็น ช่องว่าง<sub>x</sub> × เศษทศนิยม(ปลาย<sub>y</sub>)<br>
+                    </section>
+                    &emsp;ปลาย<sub>x</sub> = ปัดเศษ(x<sub>2</sub>)<br>
+                    &emsp;ปลาย<sub>y</sub> = y<sub>2</sub> + ความชัน × (ปลาย<sub>x</sub> - x<sub>2</sub>)<br>
+                    &emsp;ช่องว่าง<sub>x</sub> = เศษทศนิยม(x<sub>2</sub>)<br>
+                    &emsp;พิกเซลจุดสิ้นสุด<sub>x</sub> = ปลาย<sub>x</sub><br>
+                    &emsp;พิกเซลจุดสิ้นสุด<sub>y</sub> = ปัดเศษลง(ปลาย<sub>y</sub>)<br>
+                    &emsp;ถ้า ตั้งชัน :<br>
+                    <section style="color:orange">
+                        &emsp;&emsp;ลงจุดที่ตำแหน่ง (พิกเซลจุดสิ้นสุด<sub>y</sub>, พิกเซลจุดสิ้นสุด<sub>x</sub>) ด้วยความเข้มเป็น ช่องว่าง<sub>x</sub> × (1 - เศษทศนิยม(ปลาย<sub>y</sub>) )<br>
+                        &emsp;&emsp;ลงจุดที่ตำแหน่ง (พิกเซลจุดสิ้นสุด<sub>y</sub> + 1, พิกเซลจุดสิ้นสุด<sub>x</sub>) ด้วยความเข้มเป็น ช่องว่าง<sub>x</sub> × เศษทศนิยม(ปลาย<sub>y</sub>)<br>
+                    </section>
+                    &emsp;มิฉะนั้น :<br>
+                    <section style="color:orange">
+                        &emsp;&emsp;ลงจุดที่ตำแหน่ง (พิกเซลจุดสิ้นสุด<sub>x</sub>, พิกเซลจุดสิ้นสุด<sub>y</sub>) ด้วยความเข้มเป็น ช่องว่าง<sub>x</sub> × (1 - เศษทศนิยม(ปลาย<sub>y</sub>) )<br>
+                        &emsp;&emsp;ลงจุดที่ตำแหน่ง (พิกเซลจุดสิ้นสุด<sub>x</sub>, พิกเซลจุดสิ้นสุด<sub>y</sub> + 1) ด้วยความเข้มเป็น ช่องว่าง<sub>x</sub> × เศษทศนิยม(ปลาย<sub>y</sub>)<br>
+                    </section>
+                    &emsp;การแทรกสอด<sub>y</sub> = ปลาย<sub>y</sub> + ความชัน<br>
+                    &emsp;x<sub>วาด</sub> = พิกเซลจุดเริ่มต้น<sub>x</sub> + 1<br>
+                    &emsp;ตราปใดที่ x<sub>วาด</sub> < พิกเซลจุดสิ้นสุด<sub>x</sub> :<br>
+                    <section style="color:orange">
+                        &emsp;&emsp;y<sub>วาด</sub> = ปัดเศษลง(การแทรกสอด<sub>y</sub>)<br>
+                        &emsp;&emsp;ถ้า ตั้งชัน :<br>
+                        <section style="color:pink">
+                            &emsp;&emsp;&emsp;ลงจุดที่ตำแหน่ง (y<sub>วาด</sub>, x<sub>วาด</sub>) ด้วยความเข้มเป็น 1 - เศษทศนิยม(การแทรกสอด<sub>y</sub>)<br>
+                            &emsp;&emsp;&emsp;ลงจุดที่ตำแหน่ง (y<sub>วาด</sub> + 1, x<sub>วาด</sub>) ด้วยความเข้มเป็น เศษทศนิยม(การแทรกสอด<sub>y</sub>)<br>
+                        </section>
+                        &emsp;&emsp;มิฉะนั้น :<br>
+                        <section style="color:pink">
+                            &emsp;&emsp;&emsp;ลงจุดที่ตำแหน่ง (x<sub>วาด</sub>, y<sub>วาด</sub>) ด้วยความเข้มเป็น 1 - เศษทศนิยม(การแทรกสอด<sub>y</sub>)<br>
+                            &emsp;&emsp;&emsp;ลงจุดที่ตำแหน่ง (x<sub>วาด</sub>, y<sub>วาด</sub> + 1) ด้วยความเข้มเป็น เศษทศนิยม(การแทรกสอด<sub>y</sub>)<br>
+                        </section>
+                        &emsp;&emsp;การแทรกสอด<sub>y</sub> เพิ่มไปทีละ ความชัน<br>
+                        &emsp;&emsp;x<sub>วาด</sub> เพิ่มไปทีละ 1<br>
+                    </section>
+                </section>
+            </section>
+        </p>
+        <div class="button-container">
+            <button onclick="copyCode()">คัดลอกโค้ด JavaScript</button>
+        </div>
+    </div> 
+    <script>
+        const canvas1 = document.getElementById('canvas');
+        const ctx1 = canvas1.getContext('2d');
+        const canvas2 = document.getElementById('gridCanvas');
+        const ctx2 = canvas2.getContext('2d');
+        const CELL_SIZE = 20;
+
+        function drawGrid(ctx, width, height, cellSize) {
+            ctx.strokeStyle = 'white';
+            for (let x = 0; x <= width; x += cellSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            for (let y = 0; y <= height; y += cellSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+        }
+
+        function drawPixel(ctx, x, y, intensity, pixelSize) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${intensity})`;
+            ctx.fillRect(
+                Math.floor(x) * pixelSize,
+                Math.floor(y) * pixelSize,
+                pixelSize,
+                pixelSize
+            );
+        }
+
+        function copyCode() {
+            const code = `function drawLine(x1, y1, x2, y2) {
+    const steep = Math.abs(y2 - y1) > Math.abs(x2 - x1);
+
+    if (steep) {
+        [x1, y1] = [y1, x1];
+        [x2, y2] = [y2, x2];
+    }
+
+    if (x1 > x2) {
+        [x1, x2] = [x2, x1];
+        [y1, y2] = [y2, y1];
+    }
+
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const gradient = dy / dx;
+
+    let xEnd = Math.round(x1);
+    let yEnd = y1 + gradient * (xEnd - x1);
+    let xGap = 1 - (x1 % 1);
+    const xPixel1 = xEnd;
+    const yPixel1 = Math.floor(yEnd);
+
+    if (steep) {
+        drawPixel(yPixel1, xPixel1, (1 - (yEnd % 1)) * xGap);
+        drawPixel(yPixel1 + 1, xPixel1, (yEnd % 1) * xGap);
+    } else {
+        drawPixel(xPixel1, yPixel1, (1 - (yEnd % 1)) * xGap);
+        drawPixel(xPixel1, yPixel1 + 1, (yEnd % 1) * xGap);
+    }
+
+    let intery = yEnd + gradient;
+
+    xEnd = Math.round(x2);
+    yEnd = y2 + gradient * (xEnd - x2);
+    xGap = x2 % 1;
+    const xPixel2 = xEnd;
+    const yPixel2 = Math.floor(yEnd);
+
+    if (steep) {
+        drawPixel(yPixel2, xPixel2, (1 - (yEnd % 1)) * xGap);
+        drawPixel(yPixel2 + 1, xPixel2, (yEnd % 1) * xGap);
+    } else {
+        drawPixel(xPixel2, yPixel2, (1 - (yEnd % 1)) * xGap);
+        drawPixel(xPixel2, yPixel2 + 1, (yEnd % 1) * xGap);
+    }
+
+    for (let x = xPixel1 + 1; x < xPixel2; x++) {
+        const y = Math.floor(intery);
+        if (steep) {
+            drawPixel(y, x, 1 - (intery % 1));
+            drawPixel(y + 1, x, intery % 1);
+        } else {
+            drawPixel(x, y, 1 - (intery % 1));
+            drawPixel(x, y + 1, intery % 1);
+        }
+        intery += gradient;
+    }
+}`;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('โค้ดถูกคัดลองไปใส่ในคลิปบอร์ดแล้ว');
+            }).catch(() => {
+                alert('ค้ดลอกโค้ดไม่สำเร็จ');
+            });
+        }
+
+        function drawXiaolinWuLine(ctx, x1, y1, x2, y2, pixelSize = 1) {
+            const steep = Math.abs(y2 - y1) > Math.abs(x2 - x1);
+
+            if (steep) {
+                [x1, y1] = [y1, x1];
+                [x2, y2] = [y2, x2];
+            }
+
+            if (x1 > x2) {
+                [x1, x2] = [x2, x1];
+                [y1, y2] = [y2, y1];
+            }
+
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const gradient = dy / dx;
+
+            let xEnd = Math.round(x1);
+            let yEnd = y1 + gradient * (xEnd - x1);
+            let xGap = 1 - (x1 % 1);
+            const xPixel1 = xEnd;
+            const yPixel1 = Math.floor(yEnd);
+
+            if (steep) {
+                drawPixel(ctx, yPixel1, xPixel1, (1 - (yEnd % 1)) * xGap, pixelSize);
+                drawPixel(ctx, yPixel1 + 1, xPixel1, (yEnd % 1) * xGap, pixelSize);
+            } else {
+                console.log(yEnd);
+                console.log(y1 + " + " + gradient + " * (" + xEnd + " - " + x1 + " % 1) % 1");
+                drawPixel(ctx, xPixel1, yPixel1, (1 - (yEnd % 1)) * xGap, pixelSize);
+                drawPixel(ctx, xPixel1, yPixel1 + 1, (yEnd % 1) * xGap, pixelSize);
+            }
+
+            let intery = yEnd + gradient;
+
+            xEnd = Math.round(x2);
+            yEnd = y2 + gradient * (xEnd - x2);
+            xGap = x2 % 1;
+            const xPixel2 = xEnd;
+            const yPixel2 = Math.floor(yEnd);
+
+            if (steep) {
+                drawPixel(ctx, yPixel2, xPixel2, (1 - (yEnd % 1)) * xGap, pixelSize);
+                drawPixel(ctx, yPixel2 + 1, xPixel2, (yEnd % 1) * xGap, pixelSize);
+            } else {
+                drawPixel(ctx, xPixel2, yPixel2, (1 - (yEnd % 1)) * xGap, pixelSize);
+                drawPixel(ctx, xPixel2, yPixel2 + 1, (yEnd % 1) * xGap, pixelSize);
+            }
+
+            for (let x = xPixel1 + 1; x < xPixel2; x++) {
+                const y = Math.floor(intery);
+                if (steep) {
+                    drawPixel(ctx, y, x, 1 - (intery % 1), pixelSize);
+                    drawPixel(ctx, y + 1, x, intery % 1, pixelSize);
+                } else {
+                    drawPixel(ctx, x, y, 1 - (intery % 1), pixelSize);
+                    drawPixel(ctx, x, y + 1, intery % 1, pixelSize);
+                }
+                intery += gradient;
+            }
+        }
+
+        drawXiaolinWuLine(ctx1, 50, 200, 350, 100, 1);
+        drawXiaolinWuLine(ctx1, 50, 190, 350, 120, 1);
+        drawXiaolinWuLine(ctx1, 50, 180, 350, 140, 1);
+        drawXiaolinWuLine(ctx1, 50, 170, 350, 160, 1);
+        drawXiaolinWuLine(ctx1, 50, 160, 350, 180, 1);
+        drawXiaolinWuLine(ctx1, 50, 150, 350, 200, 1);
+        drawXiaolinWuLine(ctx1, 50, 140, 350, 220, 1);
+        drawXiaolinWuLine(ctx1, 50, 130, 350, 240, 1);
+        drawXiaolinWuLine(ctx1, 50, 120, 350, 260, 1);
+        drawXiaolinWuLine(ctx1, 50, 110, 350, 280, 1);
+        drawXiaolinWuLine(ctx1, 50, 100, 350, 300, 1);
+
+        drawGrid(ctx2, canvas2.width, canvas2.height, CELL_SIZE);
+        drawXiaolinWuLine(ctx2, 2, 4, 18, 14, CELL_SIZE);
+
+        function drawLineNormally(x1, y1, x2, y2) {
+            ctx2.strokeStyle = 'purple';
+            ctx2.lineWidth = 3;
+            ctx2.beginPath();
+            ctx2.moveTo(x1, y1);
+            ctx2.lineTo(x2, y2);
+            ctx2.stroke();
+        }
+
+        drawLineNormally(40, 80, 360, 280);
+    </script>
+</body>
+</html>
