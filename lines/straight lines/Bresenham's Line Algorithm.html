@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bresenham's Line Drawing Algorithm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: black;
+            color: white;
+            justify-content: center;
+        }
+
+        canvas {
+            margin: 10px;
+            border: 1px solid blue;
+        }
+
+        .explanation {
+            max-width: 800px;
+            text-align: justify;
+        }
+
+        .grid-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="..\..\index.html" style="color: lime">หน้าหลัก</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1 style="text-align: center; color:cyan">ขั้นตอนวิธีลากเส้นตรงของ Bresenham<br>(Bresenham's Line Drawing Algorithm)</h1>
+    <p>
+        <canvas id="mainCanvas" width="400" height="400"></canvas>
+        <canvas id="gridCanvas" width="400" height="400"></canvas>
+    </p>
+    <div class="explanation">
+        <p style="text-align: center">
+            ขั้นตอนวิธีลากเส้นตรงของ Bresenham เป็นขั้นตอนวิธีที่มีประสิทธิภาพ<br>
+            ที่ถูกใช้เพื่อวาดเส้นตรงระหว่างจุดสองจุดในรูปแบบพิกเซล
+        </p>
+        <br>
+        <h2 style="text-align: center; color:cyan">โค้ดเทียมขั้นตอนวิธีเส้นของ Bresenham</h2>
+        <p>
+            <section style="color:orange">
+                ฟังก์ชัน ลากเส้นจากจุด (x<sub>1</sub>, y<sub>1</sub>) ไปที่จุด (x<sub>2</sub>, y<sub>2</sub>) :<br>
+                <section style="color:pink">
+                    &emsp;x<sub>ล่าสุด</sub> = x<sub>1</sub><br>
+                    &emsp;y<sub>ล่าสุด</sub> = y<sub>1</sub><br>
+                    &emsp;ระยะ<sub>x</sub> = |x<sub>2</sub> - x<sub>1</sub>|<br>
+                    &emsp;ระยะ<sub>y</sub> = |y<sub>2</sub> - y<sub>1</sub>|<br>
+                    &emsp;ก้าว<sub>x</sub> = 1 ถ้า x<sub>1</sub> < x<sub>2</sub> มิฉะนั้น ก้าว<sub>x</sub> = -1<br>
+                    &emsp;ก้าว<sub>y</sub> = 1 ถ้า y<sub>1</sub> < y<sub>2</sub> มิฉะนั้น ก้าว<sub>y</sub> = -1<br>
+                    &emsp;ความคลาดเคลื่อน = ระยะ<sub>x</sub> - ระยะ<sub>y</sub><br>
+                    &emsp;ในขณะที่ x<sub>ล่าสุด</sub> ≠ x<sub>2</sub> หรือ y<sub>ล่าสุด</sub> ≠ y<sub>2</sub> :<br>
+                    <section style="color:orange">
+                        &emsp;&emsp;ลงจุดที่ตำแหน่ง (x<sub>ล่าสุด</sub>, y<sub>ล่าสุด</sub>)<br>
+                        &emsp;&emsp;ถ้า 2 × ความคลาดเคลื่อน > -1 × ระยะ<sub>y</sub> :<br>
+                        <section style="color:pink">
+                            &emsp;&emsp;&emsp;x<sub>ล่าสุด</sub> เพิ่มไปทีละ ก้าว<sub>x</sub><br>
+                            &emsp;&emsp;&emsp;ความคลาดเคลื่อน ลดไปทีละ ระยะ<sub>y</sub><br>
+                        </section>
+                        &emsp;&emsp;ถ้า 2 × ความคลาดเคลื่อน < ระยะ<sub>x</sub> :<br>
+                        <section style="color:pink">
+                            &emsp;&emsp;&emsp;y<sub>ล่าสุด</sub> เพิ่มไปทีละ ก้าว<sub>y</sub><br>
+                            &emsp;&emsp;&emsp;ความคลาดเคลื่อน เพิ่มไปทีละ ระยะ<sub>x</sub><br>
+                        </section>
+                    </section>
+                </section>
+            </section>
+        </p>
+        <div class="button-container">
+            <button onclick="copyCode()">คัดลอกโค้ด JavaScript</button>
+        </div>
+    </div>
+    <script>
+        const mainCanvas = document.getElementById('mainCanvas');
+        const mainCtx = mainCanvas.getContext('2d');
+        const gridCanvas = document.getElementById('gridCanvas');
+        const gridCtx = gridCanvas.getContext('2d');
+        const CELL_SIZE = 20;
+
+        function drawGrid() {
+            gridCtx.strokeStyle = 'white';
+            for (let x = 0; x <= gridCanvas.width; x += CELL_SIZE) {
+                gridCtx.beginPath();
+                gridCtx.moveTo(x, 0);
+                gridCtx.lineTo(x, gridCanvas.height);
+                gridCtx.stroke();
+            }
+            for (let y = 0; y <= gridCanvas.height; y += CELL_SIZE) {
+                gridCtx.beginPath();
+                gridCtx.moveTo(0, y);
+                gridCtx.lineTo(gridCanvas.width, y);
+                gridCtx.stroke();
+            }
+        }
+
+        function copyCode() {
+            const code = `function drawLine(x1, y1, x2, y2) {
+    let dx = Math.abs(x2 - x1);
+    let dy = Math.abs(y2 - y1);
+    let sx = x1 < x2 ? 1 : -1;
+    let sy = y1 < y2 ? 1 : -1;
+    let err = dx - dy;
+
+    while (x1 !== x2 || y1 !== y2) {
+        addDot(x1, y1);
+
+        let e2 = 2 * err;
+        if (e2 > -dy) {
+            err -= dy;
+            x1 += sx;
+        }
+
+        if (e2 < dx) {
+            err += dx;
+            y1 += sy;
+        }
+    }
+}`;
+
+            navigator.clipboard.writeText(code).then(() => {
+                alert('โค้ดถูกคัดลองไปใส่ในคลิปบอร์ดแล้ว');
+            }).catch(() => {
+                alert('ค้ดลอกโค้ดไม่สำเร็จ');
+            });
+        }
+
+        function drawLine(x1, y1, x2, y2, ctx, drawInGrid = false) {
+            let dx = Math.abs(x2 - x1);
+            let dy = Math.abs(y2 - y1);
+            let sx = x1 < x2 ? 1 : -1;
+            let sy = y1 < y2 ? 1 : -1;
+            let err = dx - dy;
+
+            while (x1 !== x2 || y1 !== y2) {
+                if (drawInGrid)
+                    highlightCell(x1, y1);
+                else
+                    addDot(x1, y1, ctx);
+
+                let e2 = 2 * err;
+                if (e2 > -dy) {
+                    err -= dy;
+                    x1 += sx;
+                }
+
+                if (e2 < dx) {
+                    err += dx;
+                    y1 += sy;
+                }
+            }
+        }
+
+        function addDot(x, y, ctx) {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(x, y, 1, 1);
+        }
+
+        function highlightCell(x, y) {
+            gridCtx.fillStyle = 'white';
+            gridCtx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+
+        drawLine(50, 200, 350, 100, mainCtx);
+        drawLine(50, 190, 350, 120, mainCtx);
+        drawLine(50, 180, 350, 140, mainCtx);
+        drawLine(50, 170, 350, 160, mainCtx);
+        drawLine(50, 160, 350, 180, mainCtx);
+        drawLine(50, 150, 350, 200, mainCtx);
+        drawLine(50, 140, 350, 220, mainCtx);
+        drawLine(50, 130, 350, 240, mainCtx);
+        drawLine(50, 120, 350, 260, mainCtx);
+        drawLine(50, 110, 350, 280, mainCtx);
+        drawLine(50, 100, 350, 300, mainCtx);
+
+        drawGrid();
+        drawLine(2, 4, 18, 14, null, true);
+
+        function drawLineNormally(x1, y1, x2, y2) {
+            gridCtx.strokeStyle = 'purple';
+            gridCtx.lineWidth = 3;
+            gridCtx.beginPath();
+            gridCtx.moveTo(x1, y1);
+            gridCtx.lineTo(x2, y2);
+            gridCtx.stroke();
+        }
+
+        drawLineNormally(40, 80, 360, 280);
+    </script>
+</body>
+</html>
